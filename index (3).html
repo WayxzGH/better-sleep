@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1330"><meta name="description" content="Better Sleep — советы, калькулятор сна, дыхание 4-7-8, дневник и шум для сна">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Better Sleep</title>
+<style>
+:root{--bg:#0d1330;--card:#1a2250;--line:#2e3a78;--tx:#eef1ff;--mu:#a9b3e0;--ac:#8fa4ff;--ac2:#c8b6ff}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:linear-gradient(180deg,#0d1330,#080b1e);color:var(--tx);font-family:system-ui,sans-serif;min-height:100vh;
+padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(86px + env(safe-area-inset-bottom,0px))}
+main{max-width:560px;margin:auto}
+h1{font-size:1.5rem;margin:4px 0 2px}h2{font-size:1.15rem;margin:0 0 10px}p{line-height:1.55}
+.mu{color:var(--mu)}.sm{font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+button,input,select,textarea{font:inherit}
+input,select,textarea{width:100%;background:#0f1637;color:var(--tx);border:1px solid var(--line);border-radius:12px;padding:11px;margin:5px 0 10px}
+label{font-size:.9rem;color:var(--mu)}
+.btn{width:100%;border:0;border-radius:12px;padding:12px;font-weight:700;color:#0d1330;background:linear-gradient(100deg,var(--ac),var(--ac2));cursor:pointer}
+.btn.sec{background:#2a3470;color:var(--tx);border:1px solid var(--line)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.chip{flex:none;border:1px solid var(--line);background:#141b45;color:var(--tx);border-radius:99px;padding:7px 13px;cursor:pointer}
+.chip.on{background:var(--ac);color:#0d1330;font-weight:700}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0}
+summary{font-weight:600;cursor:pointer}details p{margin:8px 0 0;color:var(--mu)}
+.res{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.res b{font-size:1.2rem;color:var(--ac2)}
+.circle{width:170px;height:170px;margin:20px auto;border-radius:50%;background:radial-gradient(circle,var(--ac2),var(--ac) 70%);display:grid;place-items:center;color:#0d1330;font-weight:800;text-align:center;transform:scale(.6);transition:transform 4s ease-in-out}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.entry{border-bottom:1px solid var(--line);padding:10px 0}.entry:last-child{border:0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#0a0f28;border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;background:none;border:0;color:var(--mu);padding:6px 2px;font-size:.72rem;cursor:pointer}
+nav button span{display:block;font-size:1.35rem}nav button.on{color:var(--ac2);font-weight:700}
+@media(prefers-reduced-motion:reduce){.circle{transition:none!important}}
+</style></head><body><main>
+<h1>🌙 Better Sleep</h1><p class="mu sm" style="margin-top:0">Спи лучше — просто и бесплатно</p>
+
+<section id="tips"><div class="chips" id="chips"></div><div id="tipList"></div>
+<p class="mu sm">Если проблемы со сном длятся больше месяца или вы сильно устаёте днём — обратитесь к врачу. Приложение не заменяет медицинскую помощь.</p></section>
+
+<section id="calc" hidden><div class="card"><h2>⏰ Калькулятор сна</h2>
+<p class="mu sm">Цикл сна ≈ 90 минут, на засыпание закладываем 15 минут. Просыпаться в конце цикла легче.</p>
+<label for="wake">Мне нужно встать в</label><input type="time" id="wake" value="07:00">
+<div id="r1"></div></div>
+<div class="card"><h2>Если лягу сейчас</h2><div id="r2"></div></div></section>
+
+<section id="breathe" hidden><div class="card" style="text-align:center"><h2>🫁 Дыхание 4‑7‑8</h2>
+<p class="mu sm">Вдох 4 с · задержка 7 с · выдох 8 с. 4 цикла обычно хватает, чтобы расслабиться.</p>
+<div class="circle" id="circ"><div><div id="bl">Готово</div><div id="bn" style="font-size:2rem"></div></div></div>
+<p class="mu" id="bc">Циклов: 0</p><button class="btn" id="bgo">Начать</button></div></section>
+
+<section id="diary" hidden><div class="card"><h2>📓 Дневник сна</h2>
+<div class="row"><div><label for="bed">Лёг</label><input type="time" id="bed" value="23:00"></div>
+<div><label for="wk">Встал</label><input type="time" id="wk" value="07:00"></div></div>
+<label for="q">Самочувствие утром</label><select id="q"><option value="5">😄 5 — отлично</option><option value="4">🙂 4 — хорошо</option><option value="3" selected>😐 3 — нормально</option><option value="2">😕 2 — плохо</option><option value="1">😫 1 — ужасно</option></select>
+<label for="note">Заметка (необязательно)</label><input id="note" maxlength="80" placeholder="Кофе вечером, поздний ужин…">
+<button class="btn" id="dsave">Сохранить запись</button><p class="mu sm" id="dmsg"></p></div>
+<div class="card"><h2>История</h2><p class="mu" id="dstat"></p><div id="dlist"></div></div></section>
+
+<section id="sound" hidden><div class="card"><h2>🎧 Шум для сна</h2>
+<p class="mu sm">Звук создаётся прямо в телефоне — интернет и файлы не нужны.</p>
+<label for="stype">Тип</label><select id="stype"><option value="brown">Коричневый (глубокий)</option><option value="pink">Розовый (мягкий)</option><option value="white">Белый (ровный)</option></select>
+<label for="vol">Громкость</label><input type="range" id="vol" min="0" max="100" value="30">
+<label for="tm">Выключить через</label><select id="tm"><option value="0">Не выключать</option><option value="15">15 минут</option><option value="30" selected>30 минут</option><option value="60">60 минут</option></select>
+<button class="btn" id="sgo">▶ Включить</button></div></section>
+</main>
+<nav id="nav"><button data-t="tips" class="on"><span>💡</span>Советы</button><button data-t="calc"><span>⏰</span>Расчёт</button><button data-t="breathe"><span>🫁</span>Дыхание</button><button data-t="diary"><span>📓</span>Дневник</button><button data-t="sound"><span>🎧</span>Звук</button></nav>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const f=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+const toMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+
+/* Вкладки */
+function show(id){$$("main section").forEach(s=>s.hidden=s.id!==id);$$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===id));scrollTo(0,0);if(id!=="breathe")stopB();if(id!=="sound")stopS()}
+$$("nav button").forEach(b=>b.onclick=()=>show(b.dataset.t));
+
+/* Советы */
+const TIPS=[
+["Режим","Одно и то же время каждый день","Ложитесь и вставайте примерно в одно время, в том числе в выходные. Это главный способ настроить внутренние часы."],
+["Режим","Свет утром","Через 10–15 минут после пробуждения выйдите на дневной свет или откройте окно. Это помогает вечером легче засыпать."],
+["Режим","Дневной сон — короткий","Не дольше 20–30 минут и не позже 15:00, иначе вечером можно не захотеть спать."],
+["Среда","Прохладная комната","Комфортно спать при 16–19 °C. Проветрите комнату перед сном."],
+["Среда","Темнота и тишина","Плотные шторы или маска для сна, ровный фоновый шум вместо резких звуков."],
+["Среда","Кровать — только для сна","Работу и сериалы лучше перенести в другое место, чтобы мозг связывал кровать со сном."],
+["Еда и напитки","Кофеин — заранее","Кофе, чай, колу и энергетики лучше не пить за 6–8 часов до сна."],
+["Еда и напитки","Лёгкий ужин","Плотно поесть лучше за 2–3 часа до сна. Если голодно — небольшой перекус."],
+["Еда и напитки","Алкоголь не помогает","Он может ускорить засыпание, но делает сон поверхностным и тревожным."],
+["Вечер","Приглушите экраны","За 30–60 минут до сна уберите яркий свет и телефон, включите тёплое освещение."],
+["Вечер","Ритуал перед сном","Тёплый душ, чтение, растяжка, дыхание 4‑7‑8 — одни и те же действия сигнализируют мозгу, что пора спать."],
+["Вечер","Выгрузите мысли","Запишите дела на завтра на бумаге — меньше шансов прокручивать их в голове."],
+["Вечер","Не лежите без сна","Если не уснули за ~20 минут, встаньте, займитесь чем‑то спокойным при тусклом свете и вернитесь, когда захочется спать."],
+["Вечер","Спорт — днём","Регулярная активность улучшает сон, но интенсивные тренировки лучше закончить за 2–3 часа до сна."]];
+const cats=["Все",...new Set(TIPS.map(t=>t[0]))];let cat="Все";
+function drawTips(){const c=$("#chips");c.innerHTML="";cats.forEach(n=>{const b=document.createElement("button");b.className="chip"+(n===cat?" on":"");b.textContent=n;b.onclick=()=>{cat=n;drawTips()};c.appendChild(b)});
+const l=$("#tipList");l.innerHTML="";TIPS.filter(t=>cat==="Все"||t[0]===cat).forEach(t=>{const d=document.createElement("details"),s=document.createElement("summary"),p=document.createElement("p");s.textContent=t[1];p.textContent=t[2];d.append(s,p);l.appendChild(d)})}
+
+/* Калькулятор */
+function row(a,b){const d=document.createElement("div");d.className="res";const x=document.createElement("span"),y=document.createElement("b");x.textContent=a;y.textContent=b;d.append(x,y);return d}
+function calc(){const w=$("#wake").value;const r1=$("#r1"),r2=$("#r2");r1.innerHTML="";r2.innerHTML="";
+if(w)[6,5,4].forEach(n=>r1.appendChild(row("Лечь, циклов: "+n+" ("+n*1.5+" ч)",f(toMin(w)-n*90-15))));
+const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+[4,5,6].forEach(n=>r2.appendChild(row("Встать, циклов: "+n+" ("+n*1.5+" ч)",f(nm+15+n*90))))}
+$("#wake").oninput=calc;
+
+/* Дыхание 4-7-8 */
+const PH=[["Вдох",4,1],["Задержка",7,1],["Выдох",8,.6]];let bt=null,bi=0,bl=0,bcnt=0;
+function phase(){const p=PH[bi];bl=p[1];$("#bl").textContent=p[0];$("#bn").textContent=bl;const c=$("#circ");c.style.transitionDuration=(bi===1?0:p[1])+"s";c.style.transform="scale("+p[2]+")"}
+function startB(){bi=0;bcnt=0;$("#bc").textContent="Циклов: 0";$("#bgo").textContent="Стоп";phase();bt=setInterval(()=>{bl--;if(bl<=0){bi++;if(bi>2){bi=0;bcnt++;$("#bc").textContent="Циклов: "+bcnt}phase()}else $("#bn").textContent=bl},1000)}
+function stopB(){if(bt){clearInterval(bt);bt=null}$("#bl").textContent="Готово";$("#bn").textContent="";$("#bgo").textContent="Начать";const c=$("#circ");c.style.transitionDuration="1s";c.style.transform="scale(.6)"}
+$("#bgo").onclick=()=>bt?stopB():startB();
+
+/* Дневник */
+const DK="bettersleep_diary_v1";
+function today(){return new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function dur(m){return Math.floor(m/60)+" ч "+(m%60)+" мин"}
+function drawDiary(){const a=store.get(DK,[]);const l=$("#dlist");l.innerHTML="";
+$("#dstat").textContent=a.length?"Средний сон (последние 7): "+dur(Math.round(a.slice(0,7).reduce((s,e)=>s+e.mins,0)/Math.min(a.length,7))):"Пока нет записей.";
+a.forEach(e=>{const d=document.createElement("div");d.className="entry";const t=document.createElement("div");t.textContent=e.date+" · "+dur(e.mins)+" · "+"⭐".repeat(e.q);
+const s=document.createElement("div");s.className="mu sm";s.textContent=e.bed+" → "+e.wake+(e.note?" · "+e.note:"");
+const x=document.createElement("button");x.className="btn sec";x.style.cssText="width:auto;padding:5px 12px;margin-top:6px";x.textContent="Удалить";
+x.onclick=()=>{if(confirm("Удалить запись?")){store.set(DK,store.get(DK,[]).filter(i=>i.id!==e.id));drawDiary()}};d.append(t,s,x);l.appendChild(d)})}
+$("#dsave").onclick=()=>{const bed=$("#bed").value,wake=$("#wk").value,m=$("#dmsg");if(!bed||!wake){m.textContent="Укажи время.";return}
+const mins=((toMin(wake)-toMin(bed))+1440)%1440;const a=store.get(DK,[]);
+a.unshift({id:Date.now(),date:today(),bed,wake,q:+$("#q").value,note:$("#note").value.trim(),mins});
+m.textContent=store.set(DK,a.slice(0,200))?"Сохранено ✓":"Не удалось сохранить (проверь настройки браузера).";$("#note").value="";drawDiary()};
+
+/* Шум для сна (Web Audio) */
+let ac=null,src=null,gn=null,st=null;
+function buf(type){const sr=ac.sampleRate,b=ac.createBuffer(1,sr*4,sr),d=b.getChannelData(0);let l=0,b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+for(let i=0;i<d.length;i++){const w=Math.random()*2-1;
+if(type==="white")d[i]=w*.4;
+else if(type==="brown"){l=(l+.02*w)/1.02;d[i]=l*3.5}
+else{b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.969*b2+w*.153852;b3=.8665*b3+w*.3104856;b4=.55*b4+w*.5329522;b5=-.7616*b5-w*.016898;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11;b6=w*.115926}}
+return b}
+function startS(){const A=window.AudioContext||window.webkitAudioContext;if(!A){alert("Браузер не поддерживает звук.");return}
+ac=ac||new A();ac.resume();src=ac.createBufferSource();src.buffer=buf($("#stype").value);src.loop=true;gn=ac.createGain();gn.gain.value=$("#vol").value/100;src.connect(gn);gn.connect(ac.destination);src.start();
+$("#sgo").textContent="■ Выключить";const m=+$("#tm").value;if(m)st=setTimeout(stopS,m*60000)}
+function stopS(){if(st){clearTimeout(st);st=null}if(src){try{src.stop()}catch(e){}src=null}$("#sgo").textContent="▶ Включить"}
+$("#sgo").onclick=()=>src?stopS():startS();
+$("#vol").oninput=()=>{if(gn)gn.gain.value=$("#vol").value/100};
+$("#stype").onchange=()=>{if(src){stopS();startS()}};
+
+drawTips();calc();drawDiary();
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script></body></html>
